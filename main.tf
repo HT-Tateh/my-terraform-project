@@ -13,10 +13,6 @@ resource "aws_instance" "myec2" {
     }
 }
 
-resource "aws_iam_user" "team" {
-  for_each = toset(["Hilary", "Made", "Cynthia", "Celestine","Arvind"])
-  name     = each.value
-}
 
 
 
