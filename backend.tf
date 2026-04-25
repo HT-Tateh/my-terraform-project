@@ -5,6 +5,6 @@ terraform {
     region         = "us-east-1"
     encrypt        = true
     dynamodb_table = "terraform-locks-abc"
-    profile        = "arvind"
+    #profile        = "arvind"
   }
 }
