@@ -1,0 +1,17 @@
+name:  My First Terraform Deployment
+
+on:
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    name: Terraform Plan & Apply
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - name: Terraform Init
+        run: terraform init
+
+      - name: Terraform Plan
+        run: terraform plan
