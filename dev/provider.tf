@@ -1,5 +1,5 @@
 provider "aws" {
-  region     = var.region_n_virginia
+  region     = "us-east-2"
   #profile     = var.profile
 
   

@@ -1,6 +1,6 @@
 /*resource "aws_instance" "myec2" {
     for_each = {
-        Instance-1    = "t2.micro"
+        Instance-1    = "t3.micro"
         Instance-2 = "t3.micro"
     }
     ami = var.ami_id
@@ -52,5 +52,5 @@ module "vpc" {
 
   name = "my-vpc-celestine"
   cidr = "10.0.0.0/16"
-  azs  = ["us-east-1a", "us-east-1b"]
+  azs  = ["us-east-1a", "us-east-2b"]
 }*/

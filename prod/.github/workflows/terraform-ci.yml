@@ -6,19 +6,20 @@ on:
   pull_request:
     branches: [main, master]
 
-env:                                    # FIX 1: defined TF_VERSION (was referenced but never set)
+env:
   TF_VERSION: '1.7.0'
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true   # ✅ opt into Node.js 24 now
 
 jobs:
-  validate:                             # FIX 2: renamed from 'terraform' to 'validate' (plan jobs used needs: validate)
+  validate:
     name: Validate
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v4.2.2          # ✅ updated
 
       - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v3
+        uses: hashicorp/setup-terraform@v3.1.2 # ✅ updated
         with:
           terraform_version: ${{ env.TF_VERSION }}
 
@@ -31,16 +32,23 @@ jobs:
   plan-dev:
     name: Plan — DEV Environment
     runs-on: ubuntu-latest
-    needs: validate                     # FIX 3: now resolves correctly to the 'validate' job above
+    needs: validate
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4.2.2          # ✅ updated
 
-      - uses: hashicorp/setup-terraform@v3
+      - uses: hashicorp/setup-terraform@v3.1.2 # ✅ updated
         with:
           terraform_version: ${{ env.TF_VERSION }}
 
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id:     ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region:            ${{ secrets.AWS_REGION }}
+
       - name: Terraform Init & Plan (dev)
-        working-directory: dev          # FIX 4: moved working-directory inside the step, not as its own step
+        working-directory: dev
         run: |
           terraform init -backend=false
           terraform plan -input=false -lock=false
@@ -50,14 +58,21 @@ jobs:
     runs-on: ubuntu-latest
     needs: validate
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4.2.2          # ✅ updated
 
-      - uses: hashicorp/setup-terraform@v3
+      - uses: hashicorp/setup-terraform@v3.1.2 # ✅ updated
         with:
           terraform_version: ${{ env.TF_VERSION }}
 
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id:     ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region:            ${{ secrets.AWS_REGION }}
+
       - name: Terraform Init & Plan (prod)
-        working-directory: prod         # FIX 4: same fix as dev
+        working-directory: prod
         run: |
           terraform init -backend=false
           terraform plan -input=false -lock=false
@@ -65,7 +80,7 @@ jobs:
   summary:
     name: Pipeline Summary
     runs-on: ubuntu-latest
-    needs: [validate, plan-dev, plan-prod]  # FIX 5: proper indentation under jobs
+    needs: [validate, plan-dev, plan-prod]
     if: always()
     steps:
       - name: Print Summary
